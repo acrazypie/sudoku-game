@@ -10,13 +10,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (savedTheme === "dark") {
         darkBtn.disabled = true;
         lightBtn.disabled = false;
-        lightBtn.classList.remove("selected");
-        darkBtn.classList.add("selected");
+        lightBtn.classList.remove("active");
+        darkBtn.classList.add("active");
     } else {
         lightBtn.disabled = true;
         darkBtn.disabled = false;
-        darkBtn.classList.remove("selected");
-        lightBtn.classList.add("selected");
+        darkBtn.classList.remove("active");
+        lightBtn.classList.add("active");
     }
 
     // Function to change theme
@@ -27,8 +27,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         lightBtn.disabled = isLight;
         darkBtn.disabled = !isLight;
-        lightBtn.classList.toggle("selected", isLight);
-        darkBtn.classList.toggle("selected", !isLight);
+        lightBtn.classList.toggle("active", isLight);
+        darkBtn.classList.toggle("active", !isLight);
     };
 
     // Event listeners
