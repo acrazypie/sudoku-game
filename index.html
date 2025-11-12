@@ -5,8 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="/js/lang.js"></script>
         <script src="/js/theme.js" defer></script>
+        <script src="/js/sudoku.js"></script>
         <link rel="stylesheet" href="/css/style.css" />
-        <link rel="icon" type="image/png" href="/icons/logo.png" />
+        <link rel="icon" type="image/png" href="/icons/icon.png" />
         <title>Sudoku Game</title>
     </head>
 
@@ -165,6 +166,18 @@
                     </button>
                 </div>
             </div>
+
+            <div id="win-screen" class="screen">
+                <div class="gameOver">
+                    <span data-i18n="win-text"> Yay! You solved it! </span>
+                    <button
+                        id="retry-button"
+                        data-i18n="win-btn"
+                        class="button">
+                        Home
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- FOOTER -->
@@ -221,7 +234,7 @@
             </div>
             <p data-i18n="powered">Powered by sudoku.js</p>
         </footer>
-
-        <script src="/js/script.js"></script>
     </body>
+
+    <script src="/js/script.js" defer></script>
 </html>

@@ -13,6 +13,7 @@
     --green-300: #3b7549;
     --green-400: #428151;
     --green-acc: #2d9748;
+    --green-acc-shadow: #2d9747aa;
 
     --highlight: #6dd585d1;
 
@@ -313,15 +314,18 @@ p {
 
 /* Highlight styles */
 .selected {
-    background-color: #d3e5ff !important;
+    outline: 2px solid var(--green-acc);
+    background-color: var(--highlight) !important;
+    transition: background-color 0.2s, outline 0.2s;
 }
 
 .related {
-    background-color: #eef5ff !important;
+    background-color: var(--highlight) !important;
+    transition: background-color 0.2s;
 }
 
 .user-filled {
-    background-color: #d7ffd7 !important;
+    background-color: var(--light-grey) !important;
 }
 
 .locked {
@@ -330,7 +334,9 @@ p {
 }
 
 .same-number {
-    background-color: #fff9c4 !important;
+    background-color: var(--green-acc) !important;
+    box-shadow: 0 0 6px var(--green-acc-shadow);
+    transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .gameOver {
