@@ -3,6 +3,10 @@
 // Game logic for Sudoku UI using sudoku.js library
 // -------------------------------------------
 
+import "./sudoku.js";
+import sudoku from "./sudoku.js";
+import sudoku from "./sudoku.js";
+
 let selectedCell = null;
 let currentBoard = "";
 let solution = "";
@@ -71,6 +75,18 @@ function stopTimer() {
 }
 
 // -------------------------------------------
+// Change scene
+// -------------------------------------------
+function changeScene(scene) {
+    startScreen.classList.remove("active");
+    gameScreen.classList.remove("active");
+    overScreen.classList.remove("active");
+    winScreen.classList.remove("active");
+
+    scene.classList.add("active");
+}
+
+// -------------------------------------------
 // Generate board
 // -------------------------------------------
 function generateBoard(boardString) {
@@ -134,30 +150,37 @@ function generateBoard(boardString) {
 }
 
 // -------------------------------------------
-// Change scene
-// -------------------------------------------
-function changeScene(scene) {
-    startScreen.classList.remove("active");
-    gameScreen.classList.remove("active");
-    overScreen.classList.remove("active");
-    winScreen.classList.remove("active");
-
-    scene.classList.add("active");
-}
-
-// -------------------------------------------
 // Start Game
 // -------------------------------------------
 startBtn.addEventListener("click", () => {
-    currentBoard = sudoku.generate(selectedDifficulty);
+    // Reset UI variables
     mistakes = 0;
     hintsLeft = 2;
     errCounter.textContent = mistakes;
     numHint.textContent = hintsLeft;
 
-    changeScene(gameScreen);
+    // Track time for generation speed
+    const t0 = performance.now();
 
-    generateBoard(currentBoard);
+    // Generate a new puzzle with the selected difficulty
+    const board = sudoku.generate(selectedDifficulty, true);
+
+    const t1 = performance.now();
+    const genTime = ((t1 - t0) / 1000).toFixed(2);
+
+    console.log(`Generated new ${selectedDifficulty} puzzle in ${genTime}s`);
+
+    // Save global board reference
+    currentBoard = board;
+
+    // Precompute the solution for hints / checking
+    solution = sudoku.solve(board);
+
+    // Load board visually
+    changeScene(gameScreen);
+    generateBoard(board);
+
+    // Start timer
     startTimer();
 });
 
