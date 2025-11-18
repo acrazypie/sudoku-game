@@ -838,3 +838,5 @@
     // Pass whatever the root object is, like 'window' in browsers
     return sudoku;
 });
+
+export default sudoku;

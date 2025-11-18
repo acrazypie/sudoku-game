@@ -3,10 +3,9 @@
 // Game logic for Sudoku UI using sudoku.js library
 // -------------------------------------------
 
-import "./sudoku.js";
-import sudoku from "./sudoku.js";
 import sudoku from "./sudoku.js";
 
+// --- VARS ---
 let selectedCell = null;
 let currentBoard = "";
 let solution = "";
@@ -14,6 +13,8 @@ let mistakes = 0;
 let timer = null;
 let seconds = 0;
 let hintsLeft = 2;
+let undoStack = [];
+let selectedDifficulty = "easy";
 
 // --- ELEMENTS ---
 const startScreen = document.getElementById("start-screen");
@@ -31,9 +32,6 @@ const timerMin = document.getElementById("timer-min");
 const timerSec = document.getElementById("timer-sec");
 const numPad = document.getElementById("numPad");
 const numHint = document.getElementById("num-hint");
-
-let undoStack = [];
-let selectedDifficulty = "easy";
 
 // -------------------------------------------
 // Difficulty selection
@@ -75,18 +73,6 @@ function stopTimer() {
 }
 
 // -------------------------------------------
-// Change scene
-// -------------------------------------------
-function changeScene(scene) {
-    startScreen.classList.remove("active");
-    gameScreen.classList.remove("active");
-    overScreen.classList.remove("active");
-    winScreen.classList.remove("active");
-
-    scene.classList.add("active");
-}
-
-// -------------------------------------------
 // Generate board
 // -------------------------------------------
 function generateBoard(boardString) {
@@ -104,6 +90,7 @@ function generateBoard(boardString) {
 
             // Clicking on a prefilled cell highlights all same numbers
             cell.addEventListener("click", () => {
+                selectedCell = null;
                 clearHighlights();
                 highlightSameNumbers(char);
                 cell.classList.add("selected"); // subtle focus effect on the clicked number
@@ -176,15 +163,16 @@ startBtn.addEventListener("click", () => {
     // Precompute the solution for hints / checking
     solution = sudoku.solve(board);
 
+    // Change scene
+    startScreen.classList.remove("active");
+    gameScreen.classList.add("active");
+
     // Load board visually
-    changeScene(gameScreen);
     generateBoard(board);
 
     // Start timer
     startTimer();
 });
-
-solution = sudoku.solve(currentBoard);
 
 // -------------------------------------------
 // Cell selection
@@ -273,6 +261,7 @@ numPad.addEventListener("click", (e) => {
         selectedCell.classList.remove("selected");
         selectedCell.classList.add("locked");
         undoStack.push({ cell: selectedCell, value: number });
+        clearHighlights();
         selectedCell = null;
         checkWin();
     } else {
@@ -322,18 +311,24 @@ function checkWin() {
     );
     if (filled) {
         stopTimer();
-        changeScene(winScreen);
+
+        gameScreen.classList.remove("active");
+        winScreen.classList.add("active");
     }
 }
 
 function gameOver() {
     stopTimer();
-    changeScene(overScreen);
+    gameScreen.classList.remove("active");
+    overScreen.classList.add("active");
 }
 
 // -------------------------------------------
 // Retry
 // -------------------------------------------
 retryBtn.addEventListener("click", () => {
-    changeScene(startScreen);
+    gameScreen.classList.remove("active");
+    overScreen.classList.remove("active");
+    winScreen.classList.remove("active");
+    startScreen.classList.add("active");
 });
