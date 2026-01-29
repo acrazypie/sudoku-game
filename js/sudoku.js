@@ -382,7 +382,7 @@ sudoku._search = function (candidates, reverse) {
         for (var vi in min_candidates) {
             var val = min_candidates[vi];
 
-            // TODO: Implement a non-rediculous deep copy function
+            // TODO: Implement a non-ridicoulus deep copy function
             var candidates_copy = JSON.parse(JSON.stringify(candidates));
             var candidates_next = sudoku._search(
                 sudoku._assign(candidates_copy, min_candidates_square, val),
@@ -398,7 +398,7 @@ sudoku._search = function (candidates, reverse) {
         for (var vi = min_candidates.length - 1; vi >= 0; --vi) {
             var val = min_candidates[vi];
 
-            // TODO: Implement a non-rediculous deep copy function
+            // TODO: Implement a non-ridicoulus deep copy function
             var candidates_copy = JSON.parse(JSON.stringify(candidates));
             var candidates_next = sudoku._search(
                 sudoku._assign(candidates_copy, min_candidates_square, val),
