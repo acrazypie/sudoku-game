@@ -23,7 +23,8 @@ const overScreen = document.getElementById("over-screen");
 const winScreen = document.getElementById("win-screen");
 const boardContainer = document.getElementById("board");
 const startBtn = document.getElementById("start-button");
-const retryBtn = document.getElementById("retry-button");
+const overBtn = document.getElementById("over-button");
+const homeBtn = document.getElementById("home-button");
 const diffBtns = document.querySelectorAll(".diff-select button");
 const errCounter = document.getElementById("err-counter");
 const hintBtn = document.getElementById("hint");
@@ -178,8 +179,6 @@ startBtn.addEventListener("click", () => {
 // Cell selection
 // -------------------------------------------
 function selectCell(cell) {
-    if (cell.classList.contains("prefilled")) return;
-
     clearHighlights();
     cell.classList.add("selected");
     selectedCell = cell;
@@ -226,7 +225,7 @@ function clearHighlights() {
     boardContainer
         .querySelectorAll(".selected, .related, .same-number")
         .forEach((el) =>
-            el.classList.remove("selected", "related", "same-number")
+            el.classList.remove("selected", "related", "same-number"),
         );
 }
 
@@ -289,7 +288,7 @@ undoBtn.addEventListener("click", () => {
 hintBtn.addEventListener("click", () => {
     if (hintsLeft <= 0) return;
     const emptyCells = Array.from(boardContainer.children).filter(
-        (c) => !c.textContent
+        (c) => !c.textContent,
     );
     if (emptyCells.length === 0) return;
     const randomCell =
@@ -307,7 +306,7 @@ hintBtn.addEventListener("click", () => {
 // -------------------------------------------
 function checkWin() {
     const filled = Array.from(boardContainer.children).every(
-        (c) => c.textContent !== ""
+        (c) => c.textContent !== "",
     );
     if (filled) {
         stopTimer();
@@ -324,9 +323,16 @@ function gameOver() {
 }
 
 // -------------------------------------------
-// Retry
+// Retry / Home
 // -------------------------------------------
-retryBtn.addEventListener("click", () => {
+overBtn.addEventListener("click", () => {
+    gameScreen.classList.remove("active");
+    overScreen.classList.remove("active");
+    winScreen.classList.remove("active");
+    startScreen.classList.add("active");
+});
+
+homeBtn.addEventListener("click", () => {
     gameScreen.classList.remove("active");
     overScreen.classList.remove("active");
     winScreen.classList.remove("active");
