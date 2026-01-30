@@ -89,12 +89,10 @@ function generateBoard(boardString) {
             cell.textContent = char;
             cell.classList.add("prefilled");
 
-            // Clicking on a prefilled cell highlights all same numbers
+            // Clicking on a prefilled cell selects it and highlights same numbers
             cell.addEventListener("click", () => {
-                selectedCell = null;
-                clearHighlights();
+                selectCell(cell);
                 highlightSameNumbers(char);
-                cell.classList.add("selected"); // subtle focus effect on the clicked number
             });
 
             // Show same numbers on hover too
