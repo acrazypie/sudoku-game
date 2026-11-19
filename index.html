@@ -1,236 +1,414 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
     <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script src="js/lang.js"></script>
-        <script src="js/theme.js" defer></script>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <title>Sudoku</title>
+        <meta
+            name="description"
+            content="Free sudoku with six levels, daily challenges, notes, hints and statistics. No sign-up, no ads." />
+        <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+        <!-- browser tab -->
+        <link rel="icon" href="icons/favicon.ico" sizes="32x32" />
+        <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96.png" />
+        <!-- iOS home screen -->
+        <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="Sudoku" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <!-- Android home screen -->
+        <link rel="manifest" href="manifest.webmanifest" />
+        <script>
+            /* set the theme before first paint: saved choice, else the system setting */
+            (function () {
+                var t;
+                try {
+                    t = localStorage.getItem("theme");
+                } catch (e) {}
+                if (t !== "light" && t !== "dark")
+                    t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", t);
+            })();
+        </script>
+        <link rel="preload" href="fonts/syne-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="fonts/dm-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
         <link rel="stylesheet" href="css/style.css" />
-        <link rel="icon" type="image/png" href="icons/icon.png" />
-        <title>Sudoku Game</title>
+        <script src="js/theme.js" defer></script>
+        <script type="module" src="js/game.js"></script>
     </head>
-
     <body>
-        <!-- HEADER -->
-        <header>
-            <div class="lang-btn">
-                <button class="theme-toggle" id="lang-toggle">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-globe2"
-                        viewBox="0 0 16 16">
-                        <path
-                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855q-.215.403-.395.872c.705.157 1.472.257 2.282.287zM4.249 3.539q.214-.577.481-1.078a7 7 0 0 1 .597-.933A7 7 0 0 0 3.051 3.05q.544.277 1.198.49zM3.509 7.5c.036-1.07.188-2.087.436-3.008a9 9 0 0 1-1.565-.667A6.96 6.96 0 0 0 1.018 7.5zm1.4-2.741a12.3 12.3 0 0 0-.4 2.741H7.5V5.091c-.91-.03-1.783-.145-2.591-.332M8.5 5.09V7.5h2.99a12.3 12.3 0 0 0-.399-2.741c-.808.187-1.681.301-2.591.332zM4.51 8.5c.035.987.176 1.914.399 2.741A13.6 13.6 0 0 1 7.5 10.91V8.5zm3.99 0v2.409c.91.03 1.783.145 2.591.332.223-.827.364-1.754.4-2.741zm-3.282 3.696q.18.469.395.872c.552 1.035 1.218 1.65 1.887 1.855V11.91c-.81.03-1.577.13-2.282.287zm.11 2.276a7 7 0 0 1-.598-.933 9 9 0 0 1-.481-1.079 8.4 8.4 0 0 0-1.198.49 7 7 0 0 0 2.276 1.522zm-1.383-2.964A13.4 13.4 0 0 1 3.508 8.5h-2.49a6.96 6.96 0 0 0 1.362 3.675c.47-.258.995-.482 1.565-.667m6.728 2.964a7 7 0 0 0 2.275-1.521 8.4 8.4 0 0 0-1.197-.49 9 9 0 0 1-.481 1.078 7 7 0 0 1-.597.933M8.5 11.909v3.014c.67-.204 1.335-.82 1.887-1.855q.216-.403.395-.872A12.6 12.6 0 0 0 8.5 11.91zm3.555-.401c.57.185 1.095.409 1.565.667A6.96 6.96 0 0 0 14.982 8.5h-2.49a13.4 13.4 0 0 1-.437 3.008M14.982 7.5a6.96 6.96 0 0 0-1.362-3.675c-.47.258-.995.482-1.565.667.248.92.4 1.938.437 3.008zM11.27 2.461q.266.502.482 1.078a8.4 8.4 0 0 0 1.196-.49 7 7 0 0 0-2.275-1.52c.218.283.418.597.597.932m-.488 1.343a8 8 0 0 0-.395-.872C9.835 1.897 9.17 1.282 8.5 1.077V4.09c.81-.03 1.577-.13 2.282-.287z" />
+        <!-- NAV -->
+        <nav class="nav" aria-label="Main">
+            <a href="#/" class="nav__logo" aria-label="Sudoku home">
+                <span class="nav__mark" aria-hidden="true"
+                    ><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i></span
+                >sudoku
+            </a>
+            <div class="nav__links">
+                <a href="#/daily" class="nav__btn nav__text" data-route="daily" data-i18n="nav-daily">Daily</a>
+                <a href="#/stats" class="nav__btn nav__text" data-route="stats" data-i18n="nav-stats">Stats</a>
+                <button type="button" class="nav__btn nav__icon" id="open-rules" data-i18n-label="rules-title">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M9.6 9.2a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.6M12 17.2h.01" />
                     </svg>
                 </button>
-                <ul id="lang-menu" class="hidden">
-                    <li data-lang="en">🇬🇧 English</li>
-                    <li data-lang="it">🇮🇹 Italiano</li>
-                    <li data-lang="fr">🇫🇷 Français</li>
-                    <li data-lang="de">🇩🇪 Deutsch</li>
-                    <li data-lang="es">🇪🇸 Español</li>
-                    <li data-lang="ja">🇯🇵 日本語</li>
-                </ul>
-            </div>
-
-            <div class="theme-btns">
-                <button class="theme-toggle active" id="light-mode">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-sun-fill"
-                        viewBox="0 0 16 16">
-                        <path
-                            d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
+                <button type="button" class="nav__btn nav__icon" id="open-settings" data-i18n-label="settings">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+                        <circle cx="16" cy="7" r="2" />
+                        <circle cx="10" cy="17" r="2" />
                     </svg>
                 </button>
-                <button class="theme-toggle" id="dark-mode" disabled>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-moon-fill"
-                        viewBox="0 0 16 16">
-                        <path
-                            d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278" />
-                    </svg>
-                </button>
-            </div>
-        </header>
-
-        <!-- GAME CONTAINER -->
-        <div class="game-container">
-            <div id="start-screen" class="screen active">
-                <h1>Sudoku</h1>
-                <p data-i18n="start-desc">Test your brain!</p>
-
-                <div class="diff-select">
-                    <button data-i18n="easy-diff" id="easy" class="Dselected">
-                        Easy
-                    </button>
-                    <button data-i18n="medium-diff" id="medium">Medium</button>
-                    <button data-i18n="expert-diff" id="expert">Expert</button>
-                    <button data-i18n="master-diff" id="master">Master</button>
-                    <button data-i18n="extreme-diff" id="extreme">
-                        Extreme
-                    </button>
-                </div>
-
-                <button id="start-button" class="button" data-i18n="start-btn">
-                    Start
-                </button>
-            </div>
-
-            <div id="game-screen" class="screen">
-                <div class="top-board">
-                    <div>
-                        <span id="ms" data-i18n="mistakes"> Mistakes: </span>
-                        <span id="err-counter">0</span>/3
-                    </div>
-                    <div>
-                        <span id="tm" data-i18n="timer-g"> Time: </span>
-                        <span id="timer-min">00</span>.
-                        <span id="timer-sec">00</span>
-                    </div>
-                </div>
-
-                <div class="board" id="board"></div>
-
-                <div class="bottom-controls">
-                    <div>
-                        <button id="undo" class="theme-toggle">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                fill="currentColor"
-                                class="bi bi-arrow-counterclockwise"
-                                viewBox="0 0 16 16">
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z" />
-                                <path
-                                    d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466" />
-                            </svg>
-                        </button>
-                        <span data-i18n="undo">Undo</span>
-                    </div>
-                    <div>
-                        <div id="num-hint">2</div>
-                        <button id="hint" class="theme-toggle">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                fill="currentColor"
-                                class="bi bi-lightbulb"
-                                viewBox="0 0 16 16">
-                                <path
-                                    d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a2 2 0 0 0-.453-.618A5.98 5.98 0 0 1 2 6m6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1" />
-                            </svg>
-                        </button>
-                        <span data-i18n="hint">Hint</span>
-                    </div>
-                </div>
-
-                <div class="numbers-in" id="numPad">
-                    <button data-num="1">1</button>
-                    <button data-num="2">2</button>
-                    <button data-num="3">3</button>
-                    <button data-num="4">4</button>
-                    <button data-num="5">5</button>
-                    <button data-num="6">6</button>
-                    <button data-num="7">7</button>
-                    <button data-num="8">8</button>
-                    <button data-num="9">9</button>
-                </div>
-            </div>
-
-            <div id="over-screen" class="screen">
-                <div class="gameOver">
-                    <span data-i18n="retry-text">
-                        Next time you'll do it!
-                    </span>
+                <div class="nav-lang">
                     <button
-                        id="over-button"
-                        data-i18n="retry-btn"
-                        class="button">
-                        Retry
+                        type="button"
+                        class="nav__btn"
+                        id="lang-toggle"
+                        aria-label="Change language"
+                        aria-haspopup="true"
+                        aria-expanded="false">
+                        <span id="lang-current">EN</span>
+                        <span class="nav__arrow" aria-hidden="true">▾</span>
                     </button>
+                    <ul id="lang-menu" class="lang-menu">
+                        <li data-lang="en" role="button" tabindex="0"><span>EN</span>English</li>
+                        <li data-lang="it" role="button" tabindex="0"><span>IT</span>Italiano</li>
+                        <li data-lang="fr" role="button" tabindex="0"><span>FR</span>Français</li>
+                        <li data-lang="de" role="button" tabindex="0"><span>DE</span>Deutsch</li>
+                        <li data-lang="es" role="button" tabindex="0"><span>ES</span>Español</li>
+                        <li data-lang="ja" role="button" tabindex="0"><span>JA</span>日本語</li>
+                    </ul>
                 </div>
+                <button type="button" class="nav__btn nav__icon" id="theme-toggle" aria-label="Switch light or dark theme">
+                    <span class="theme-icon"
+                        ><svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg
+                        ><svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="4" />
+                            <path
+                                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></svg
+                    ></span>
+                </button>
             </div>
+        </nav>
 
-            <div id="win-screen" class="screen">
-                <div class="gameOver">
-                    <span data-i18n="win-text"> Yay! You solved it! </span>
-                    <button id="home-button" data-i18n="win-btn" class="button">
-                        Home
+        <main class="app" id="main">
+            <!-- HOME -->
+            <section id="screen-home" class="screen" data-screen="home">
+                <div class="home">
+                    <div class="home__intro">
+                        <p class="tag">a game by egenesio</p>
+                        <h1 class="title"><span>Sudo</span><span class="accent">ku.</span></h1>
+                        <p class="lede" data-i18n="start-desc">
+                            Classic 9×9 logic puzzles. No sign-up, no ads, everything saved on your device.
+                        </p>
+
+                        <button type="button" class="resume" id="resume" hidden>
+                            <span class="resume__label" data-i18n="continue">Continue</span>
+                            <span class="resume__meta" id="resume-meta"></span>
+                            <span class="resume__arrow" aria-hidden="true">→</span>
+                        </button>
+                    </div>
+
+                    <div class="home__menu">
+                        <h2 class="label" data-i18n="new-game">New game</h2>
+                        <ul class="rows" id="level-list"></ul>
+
+                        <h2 class="label" data-i18n="more">More</h2>
+                        <ul class="rows">
+                            <li>
+                                <a class="row" href="#/daily">
+                                    <span class="row__idx">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <rect x="3.5" y="5" width="17" height="15" rx="2" />
+                                            <path d="M3.5 10h17M8 3v4M16 3v4" />
+                                        </svg>
+                                    </span>
+                                    <span class="row__name" data-i18n="daily-title">Daily challenge</span>
+                                    <span class="row__meta" id="home-daily-meta"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="row" href="#/stats">
+                                    <span class="row__idx">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M5 20V11M12 20V4M19 20v-6" />
+                                        </svg>
+                                    </span>
+                                    <span class="row__name" data-i18n="stats-title">Statistics</span>
+                                    <span class="row__meta" id="home-stats-meta"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <button type="button" class="row" id="home-rules">
+                                    <span class="row__idx">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="9" />
+                                            <path d="M9.6 9.2a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.6M12 17.2h.01" />
+                                        </svg>
+                                    </span>
+                                    <span class="row__name" data-i18n="rules-title">How to play</span>
+                                    <span class="row__meta"></span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PLAY -->
+            <section id="screen-play" class="screen" data-screen="play">
+                <div class="play">
+                    <div class="play__board">
+                        <div class="hud">
+                            <div class="hud__cell">
+                                <span class="hud__label" data-i18n="level">Level</span>
+                                <span class="hud__val hud__val--sm" id="hud-level">Easy</span>
+                            </div>
+                            <div class="hud__cell" id="hud-mistakes-cell">
+                                <span class="hud__label" data-i18n="mistakes">Mistakes</span>
+                                <span class="hud__val" id="hud-mistakes">0/3</span>
+                            </div>
+                            <div class="hud__cell">
+                                <span class="hud__label" data-i18n="score">Score</span>
+                                <span class="hud__val" id="hud-score">0</span>
+                            </div>
+                            <div class="hud__cell hud__cell--end">
+                                <span class="hud__label" data-i18n="time">Time</span>
+                                <span class="hud__time">
+                                    <span class="hud__val" id="hud-time">00:00</span>
+                                    <button type="button" class="pause-btn" id="pause" data-i18n-label="pause">
+                                        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M9 6v12M15 6v12" />
+                                        </svg>
+                                        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M8 5.5v13l10-6.5z" />
+                                        </svg>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="board-wrap">
+                            <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
+                            <div class="paused" id="paused" hidden>
+                                <p class="tag" data-i18n="paused">Paused</p>
+                                <button type="button" class="btn" id="resume-play" data-i18n="resume">Resume</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="play__side">
+                        <div class="tools">
+                            <button type="button" class="tool" id="t-undo">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 9h11a5 5 0 0 1 0 10h-4" />
+                                    <path d="M8 5 4 9l4 4" />
+                                </svg>
+                                <span data-i18n="undo">Undo</span>
+                            </button>
+                            <button type="button" class="tool" id="t-erase">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M20 20H8.5L3.8 15.3a1.5 1.5 0 0 1 0-2.1l9.4-9.4a1.5 1.5 0 0 1 2.1 0l4.9 4.9a1.5 1.5 0 0 1 0 2.1L12 19" />
+                                    <path d="m9 9 6.5 6.5" />
+                                </svg>
+                                <span data-i18n="erase">Erase</span>
+                            </button>
+                            <button type="button" class="tool" id="t-notes" aria-pressed="false">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z" />
+                                    <path d="m14.5 5.5 3 3" />
+                                </svg>
+                                <span data-i18n="notes">Notes</span>
+                                <b class="tool__badge" id="notes-badge">off</b>
+                            </button>
+                            <button type="button" class="tool" id="t-hint">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M9 18h6M10 21h4" />
+                                    <path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.9 1 .9 1.7V16h5.4v-.5c0-.7.4-1.3.9-1.7A6 6 0 0 0 12 3z" />
+                                </svg>
+                                <span data-i18n="hint">Hint</span>
+                                <b class="tool__badge" id="hint-badge">3</b>
+                            </button>
+                        </div>
+
+                        <div class="numpad" id="numpad"></div>
+
+                        <button type="button" class="btn btn--ghost btn--wide" id="play-new" data-i18n="new-game">
+                            New game
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DAILY -->
+            <section id="screen-daily" class="screen" data-screen="daily">
+                <div class="page">
+                    <div class="page__head">
+                        <p class="tag" data-i18n="daily-tag">One puzzle a day</p>
+                        <h1 class="title title--page" data-i18n="daily-title">Daily challenge</h1>
+                        <p class="lede" data-i18n="daily-desc">
+                            A new puzzle every day, the same for everyone. Solve every day of a month to earn its
+                            trophy.
+                        </p>
+                    </div>
+
+                    <div class="daily">
+                        <div class="cal">
+                            <div class="cal__head">
+                                <button type="button" class="cal__nav" id="cal-prev" aria-label="Previous month">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
+                                </button>
+                                <div class="cal__title">
+                                    <span id="cal-month">November 2026</span>
+                                    <span class="cal__count" id="cal-count">0/30</span>
+                                </div>
+                                <button type="button" class="cal__nav" id="cal-next" aria-label="Next month">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+                                </button>
+                            </div>
+                            <div class="cal__bar" aria-hidden="true"><i id="cal-bar"></i></div>
+                            <div class="cal__week" id="cal-week"></div>
+                            <div class="cal__grid" id="cal-grid"></div>
+                        </div>
+
+                        <div class="daily__side">
+                            <div class="day-card" id="day-card">
+                                <p class="label" id="day-date"></p>
+                                <p class="day-card__level" id="day-level"></p>
+                                <p class="day-card__status" id="day-status"></p>
+                                <button type="button" class="btn" id="day-play" data-i18n="play">Play</button>
+                            </div>
+
+                            <h2 class="label" data-i18n="trophies">Trophies</h2>
+                            <ul class="trophies" id="trophies"></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STATS -->
+            <section id="screen-stats" class="screen" data-screen="stats">
+                <div class="page">
+                    <div class="page__head">
+                        <p class="tag" data-i18n="stats-tag">Your games</p>
+                        <h1 class="title title--page" data-i18n="stats-title">Statistics</h1>
+                    </div>
+                    <div class="tabs" id="stats-tabs" role="tablist"></div>
+                    <ul class="stat-list" id="stats-list"></ul>
+                    <button type="button" class="btn btn--ghost" id="stats-reset" data-i18n="reset-stats">
+                        Reset statistics
                     </button>
                 </div>
+            </section>
+        </main>
+
+        <!-- DIALOGS -->
+        <dialog class="sheet" id="dlg-settings" aria-labelledby="settings-title">
+            <div class="sheet__head">
+                <h2 id="settings-title" data-i18n="settings">Settings</h2>
+                <button type="button" class="sheet__close" data-close data-i18n-label="close">×</button>
             </div>
-        </div>
+            <ul class="toggles" id="settings-list"></ul>
+            <h3 class="label" data-i18n="data">Your data</h3>
+            <p class="muted" data-i18n="data-desc">
+                Progress is stored only in this browser. Export it to move it to another device.
+            </p>
+            <div class="actions">
+                <button type="button" class="btn btn--ghost" id="data-export" data-i18n="export">Export</button>
+                <label class="btn btn--ghost">
+                    <span data-i18n="import">Import</span>
+                    <input type="file" id="data-import" accept="application/json,.json" hidden />
+                </label>
+            </div>
+        </dialog>
+
+        <dialog class="sheet" id="dlg-rules" aria-labelledby="rules-title">
+            <div class="sheet__head">
+                <h2 id="rules-title" data-i18n="rules-title">How to play</h2>
+                <button type="button" class="sheet__close" data-close data-i18n-label="close">×</button>
+            </div>
+            <div class="rules-demo" aria-hidden="true" id="rules-demo"></div>
+            <ol class="rules">
+                <li data-i18n="r1">Fill every row, column and 3×3 box with the numbers 1 to 9.</li>
+                <li data-i18n="r2">Tap a cell, then a number.</li>
+                <li data-i18n="r3">Every puzzle has one solution.</li>
+                <li data-i18n="r4">Score.</li>
+            </ol>
+            <h3 class="label" data-i18n="keyboard">Keyboard</h3>
+            <ul class="keys">
+                <li><kbd>1</kbd>–<kbd>9</kbd> <span data-i18n="k-digit">enter a number</span></li>
+                <li><kbd>Shift</kbd> + <kbd>1</kbd>–<kbd>9</kbd> <span data-i18n="k-note">write a note</span></li>
+                <li><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> <span data-i18n="k-move">move</span></li>
+                <li><kbd>⌫</kbd> <span data-i18n="k-erase">erase</span></li>
+                <li><kbd>N</kbd> <span data-i18n="k-notes">notes on/off</span></li>
+                <li><kbd>Ctrl</kbd> + <kbd>Z</kbd> <span data-i18n="k-undo">undo</span></li>
+                <li><kbd>H</kbd> <span data-i18n="k-hint">hint</span></li>
+                <li><kbd>Space</kbd> <span data-i18n="k-pause">pause</span></li>
+            </ul>
+        </dialog>
+
+        <dialog class="sheet" id="dlg-new" aria-labelledby="new-title">
+            <div class="sheet__head">
+                <h2 id="new-title" data-i18n="new-game">New game</h2>
+                <button type="button" class="sheet__close" data-close data-i18n-label="close">×</button>
+            </div>
+            <p class="muted" id="new-warn" data-i18n="new-warn">Your current game will be lost.</p>
+            <ul class="rows" id="new-level-list"></ul>
+            <button type="button" class="btn btn--ghost btn--wide" id="new-restart" data-i18n="restart">
+                Restart this puzzle
+            </button>
+        </dialog>
+
+        <dialog class="sheet sheet--center" id="dlg-confirm">
+            <p class="confirm__text" id="confirm-text"></p>
+            <div class="actions actions--end">
+                <button type="button" class="btn btn--ghost" data-close data-i18n="cancel">Cancel</button>
+                <button type="button" class="btn" id="confirm-ok" data-i18n="ok">OK</button>
+            </div>
+        </dialog>
+
+        <dialog class="sheet sheet--center result" id="dlg-win">
+            <div class="burst" aria-hidden="true"></div>
+            <p class="tag" data-i18n="win-tag">Solved</p>
+            <h2 class="result__title" data-i18n="win-title">Well done!</h2>
+            <p class="score-big" id="win-score">0</p>
+            <p class="result__badge" id="win-record" hidden data-i18n="new-record">New best time</p>
+            <ul class="stat-list stat-list--compact" id="win-list"></ul>
+            <div class="actions actions--stack">
+                <button type="button" class="btn btn--wide" id="win-next" data-i18n="new-game">New game</button>
+                <button type="button" class="btn btn--ghost btn--wide" id="win-home" data-i18n="home">Home</button>
+            </div>
+        </dialog>
+
+        <dialog class="sheet sheet--center result" id="dlg-over">
+            <p class="tag tag--warn" data-i18n="over-tag">Game over</p>
+            <h2 class="result__title" data-i18n="over-title">So close.</h2>
+            <p class="muted" data-i18n="over-text">You made 3 mistakes, so this game is lost.</p>
+            <div class="actions actions--stack">
+                <button type="button" class="btn btn--wide" id="over-second" data-i18n="second-chance">
+                    Second chance
+                </button>
+                <button type="button" class="btn btn--ghost btn--wide" id="over-new" data-i18n="new-game">
+                    New game
+                </button>
+                <button type="button" class="btn btn--ghost btn--wide" id="over-home" data-i18n="home">Home</button>
+            </div>
+        </dialog>
+
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
         <!-- FOOTER -->
-        <footer class="footer">
-            <div class="links">
-                <a
-                    href="https://github.com/acrazypie/sudoku-game"
-                    target="_blank"
-                    id="github-ft">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-github"
-                        viewBox="0 0 16 16">
-                        <path
-                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8" />
-                    </svg>
-                </a>
-
-                <a href="https://egenesio.com" target="_blank" id="linkedin-ft"
-                    ><svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-person-workspace"
-                        viewBox="0 0 16 16">
-                        <path
-                            d="M4 16s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-5.95a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
-                        <path
-                            d="M2 1a2 2 0 0 0-2 2v9.5A1.5 1.5 0 0 0 1.5 14h.653a5.4 5.4 0 0 1 1.066-2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v9h-2.219c.554.654.89 1.373 1.066 2h.653a1.5 1.5 0 0 0 1.5-1.5V3a2 2 0 0 0-2-2z" />
-                    </svg>
-                </a>
-                <a
-                    href="https://ko-fi.com/egenesio"
-                    target="_blank"
-                    id="kofi-ft">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-cup-hot-fill"
-                        viewBox="0 0 16 16">
-                        <path
-                            fill-rule="evenodd"
-                            d="M.5 6a.5.5 0 0 0-.488.608l1.652 7.434A2.5 2.5 0 0 0 4.104 16h5.792a2.5 2.5 0 0 0 2.44-1.958l.131-.59a3 3 0 0 0 1.3-5.854l.221-.99A.5.5 0 0 0 13.5 6zM13 12.5a2 2 0 0 1-.316-.025l.867-3.898A2.001 2.001 0 0 1 13 12.5" />
-                        <path
-                            d="m4.4.8-.003.004-.014.019a4 4 0 0 0-.204.31 2 2 0 0 0-.141.267c-.026.06-.034.092-.037.103v.004a.6.6 0 0 0 .091.248c.075.133.178.272.308.445l.01.012c.118.158.26.347.37.543.112.2.22.455.22.745 0 .188-.065.368-.119.494a3 3 0 0 1-.202.388 5 5 0 0 1-.253.382l-.018.025-.005.008-.002.002A.5.5 0 0 1 3.6 4.2l.003-.004.014-.019a4 4 0 0 0 .204-.31 2 2 0 0 0 .141-.267c.026-.06.034-.092.037-.103a.6.6 0 0 0-.09-.252A4 4 0 0 0 3.6 2.8l-.01-.012a5 5 0 0 1-.37-.543A1.53 1.53 0 0 1 3 1.5c0-.188.065-.368.119-.494.059-.138.134-.274.202-.388a6 6 0 0 1 .253-.382l.025-.035A.5.5 0 0 1 4.4.8m3 0-.003.004-.014.019a4 4 0 0 0-.204.31 2 2 0 0 0-.141.267c-.026.06-.034.092-.037.103v.004a.6.6 0 0 0 .091.248c.075.133.178.272.308.445l.01.012c.118.158.26.347.37.543.112.2.22.455.22.745 0 .188-.065.368-.119.494a3 3 0 0 1-.202.388 5 5 0 0 1-.253.382l-.018.025-.005.008-.002.002A.5.5 0 0 1 6.6 4.2l.003-.004.014-.019a4 4 0 0 0 .204-.31 2 2 0 0 0 .141-.267c.026-.06.034-.092.037-.103a.6.6 0 0 0-.09-.252A4 4 0 0 0 6.6 2.8l-.01-.012a5 5 0 0 1-.37-.543A1.53 1.53 0 0 1 6 1.5c0-.188.065-.368.119-.494.059-.138.134-.274.202-.388a6 6 0 0 1 .253-.382l.025-.035A.5.5 0 0 1 7.4.8m3 0-.003.004-.014.019a4 4 0 0 0-.204.31 2 2 0 0 0-.141.267c-.026.06-.034.092-.037.103v.004a.6.6 0 0 0 .091.248c.075.133.178.272.308.445l.01.012c.118.158.26.347.37.543.112.2.22.455.22.745 0 .188-.065.368-.119.494a3 3 0 0 1-.202.388 5 5 0 0 1-.252.382l-.019.025-.005.008-.002.002A.5.5 0 0 1 9.6 4.2l.003-.004.014-.019a4 4 0 0 0 .204-.31 2 2 0 0 0 .141-.267c.026-.06.034-.092.037-.103a.6.6 0 0 0-.09-.252A4 4 0 0 0 9.6 2.8l-.01-.012a5 5 0 0 1-.37-.543A1.53 1.53 0 0 1 9 1.5c0-.188.065-.368.119-.494.059-.138.134-.274.202-.388a6 6 0 0 1 .253-.382l.025-.035A.5.5 0 0 1 10.4.8" />
-                    </svg>
-                </a>
-            </div>
-            <p data-i18n="powered">Powered by sudoku.js</p>
+        <footer>
+            <span>sudoku · made by <a href="https://egenesio.com" rel="noopener">Elisa</a></span>
+            <nav aria-label="Footer">
+                <a href="https://github.com/acrazypie/sudoku-game" target="_blank" rel="noopener">github ↗</a>
+                <a href="https://ko-fi.com/egenesio" target="_blank" rel="noopener">ko-fi ↗</a>
+            </nav>
         </footer>
     </body>
-
-    <script type="module" src="js/script.js" defer></script>
 </html>

@@ -6,73 +6,74 @@ Un'applicazione web interattiva per giocare a Sudoku con interfaccia moderna, su
 
 ## ✨ Caratteristiche
 
-- 🎯 **5 Livelli di Difficoltà**: Easy, Medium, Expert, Master, Extreme
-- 🌍 **Multilingue**: Supporto per English, Italiano, Français, Deutsch, Español, 日本語
-- 🌙 **Modalità Scura**: Tema chiaro e scuro con colori coerenti e rilassanti
-- 📱 **Mobile Responsive**: Perfettamente ottimizzato per dispositivi mobili e tablet
-- ⏱️ **Timer Integrato**: Monitora il tuo tempo di gioco
-- 💡 **Suggerimenti**: 2 suggerimenti per puzzle per guidarti quando sei bloccato
-- ↩️ **Annulla**: Annulla l'ultima mossa con un click
-- 🎨 **Interfaccia Intuitiva**: Numpad integrato e evidenziazione automatica
-- ✅ **Validazione in Tempo Reale**: Feedback immediato su mosse sbagliate
+- 🎯 **6 livelli**: Easy, Medium, Hard, Expert, Master, Extreme, graduati in base alle tecniche logiche necessarie (non solo al numero di celle date)
+- 🧩 **Generatore vero**: ogni puzzle viene generato al momento ed ha una sola soluzione
+- 📅 **Sfida del giorno**: un puzzle al giorno uguale per tutti, calendario mensile e trofei per i mesi completati
+- ✏️ **Note**: modalità matita, con rimozione automatica delle note quando inserisci un numero
+- 💡 **Aiuti intelligenti**: 3 per partita; correggono prima un numero sbagliato, poi spiegano la mossa logica successiva (singolo nudo / nascosto, coppie...)
+- ↩️ **Annulla** illimitato e **Cancella**
+- ❌ **Errori**: limite di 3 (disattivabile), con una seconda possibilità
+- 🏆 **Punteggio**: punti per ogni numero giusto, bonus per righe/colonne/riquadri completati, bonus tempo e bonus zero errori
+- 📊 **Statistiche** per livello: partite, vittorie, percentuale, miglior tempo, tempo medio, serie di vittorie, miglior punteggio
+- ⏸️ **Pausa** (automatica quando cambi scheda) e salvataggio automatico della partita
+- ⚙️ **Impostazioni**: controllo errori, evidenziazioni, timer, suoni
+- 💾 **Esporta / importa** i progressi per spostarli su un altro dispositivo
+- ⌨️ **Tastiera** completa, 🌍 6 lingue, 🌙 tema chiaro/scuro, 📱 installabile e giocabile offline (PWA)
 
 ## 🚀 Come Giocare
 
-1. Seleziona il livello di difficoltà
-2. Clicca su "Start" per iniziare una nuova partita
-3. Clicca su una cella vuota per selezionarla
-4. Scegli un numero dal numpad in basso
-5. Il gioco verificherà automaticamente se il numero è corretto
-6. Completa la griglia di Sudoku per vincere!
+1. Scegli un livello (o la sfida del giorno)
+2. Tocca una cella, poi un numero
+3. Attiva le **Note** per segnare i candidati
+4. Completa la griglia: ogni riga, colonna e riquadro 3×3 contiene i numeri da 1 a 9
 
-### Controlli
+### Tastiera
 
-- **Click su una cella**: Seleziona la cella
-- **Numpad**: Inserisci i numeri (1-9)
-- **Undo**: Annulla l'ultima mossa
-- **Hint**: Richiedi un suggerimento (massimo 2 per puzzle)
-- **Click su celle completate**: Evidenzia tutti i numeri uguali
+| Tasto | Azione |
+| --- | --- |
+| `1`–`9` | inserisci un numero |
+| `Shift` + `1`–`9` | scrivi una nota |
+| frecce | muoviti |
+| `Backspace` | cancella |
+| `N` | note sì / no |
+| `Ctrl` + `Z` | annulla |
+| `H` | aiuto |
+| `Spazio` | pausa |
 
 ## 🛠️ Tecnologie Utilizzate
 
-- **HTML5**: Struttura semantica
-- **CSS3**: Styling responsivo con grid layout
-- **JavaScript (ES6+)**: Logica di gioco modulare
-- **sudoku.js**: Generatore di puzzle sudoku (basato su [robatron/sudoku.js](https://github.com/robatron/sudoku.js))
+Solo HTML, CSS e JavaScript (moduli ES), senza build e senza dipendenze. Tutti i dati restano nel `localStorage` del browser.
 
 ## 📁 Struttura del Progetto
 
 ```
 sudoku-game/
-├── index.html              # File HTML principale
-├── css/
-│   └── style.css          # Stili e responsive design
+├── index.html
+├── manifest.webmanifest   # PWA
+├── sw.js                  # cache offline
+├── css/style.css
 ├── js/
-│   ├── script.js          # Logica principale del gioco
-│   ├── sudoku.js          # Generatore e risolutore di puzzle
-│   ├── lang.js            # Gestione lingua e localizzazione
-│   └── theme.js           # Gestione tema chiaro/scuro
-├── lang/
-│   ├── en.json            # Traduzioni inglese
-│   ├── it.json            # Traduzioni italiano
-│   ├── fr.json            # Traduzioni francese
-│   ├── de.json            # Traduzioni tedesco
-│   ├── es.json            # Traduzioni spagnolo
-│   └── ja.json            # Traduzioni giapponese
-├── icons/
-│   └── icon.png           # Favicon
-└── README.md              # Questo file
+│   ├── engine.js          # generatore, risolutore, valutazione difficoltà, aiuti
+│   ├── game.js            # interfaccia e logica di gioco
+│   ├── store.js           # salvataggi (localStorage)
+│   ├── sound.js           # effetti sonori sintetizzati
+│   ├── lang.js            # traduzioni
+│   └── theme.js           # tema chiaro/scuro
+├── lang/                  # en, it, fr, de, es, ja
+├── fonts/                 # Syne + DM Mono (OFL)
+└── icons/
 ```
 
 ## 🎮 Livelli di Difficoltà
 
-| Livello     | Celle Date | Descrizione               |
-| ----------- | ---------- | ------------------------- |
-| **Easy**    | 62         | Perfetto per principianti |
-| **Medium**  | 52         | Una sfida moderata        |
-| **Expert**  | 42         | Per giocatori esperti     |
-| **Master**  | 32         | Molto impegnativo         |
-| **Extreme** | 22         | La massima difficoltà     |
+| Livello     | Celle date | Tecniche richieste                    |
+| ----------- | ---------- | ------------------------------------- |
+| **Easy**    | ~40        | singoli                               |
+| **Medium**  | ~33        | singoli                               |
+| **Hard**    | ~26–29     | candidati bloccati                    |
+| **Expert**  | ~25–27     | coppie e terne                        |
+| **Master**  | ~23–26     | oltre le tecniche base                |
+| **Extreme** | ~22–25     | il minimo possibile di celle          |
 
 ## 🌐 Lingue Supportate
 
@@ -87,47 +88,7 @@ La lingua viene selezionata automaticamente in base alle preferenze del browser.
 
 ## 🎨 Temi
 
-- **Modalità Chiara**: Tema luminoso con colori pastello per il gioco durante il giorno
-- **Modalità Scura**: Tema verde rilassante per giocare durante la notte
-
-La preferenza del tema viene salvata nel localStorage.
-
-## 📱 Responsività
-
-L'applicazione è completamente responsive:
-
-- ✅ Desktop (1024px+)
-- ✅ Tablet (768px - 1023px)
-- ✅ Mobile (< 768px)
-
-Le dimensioni delle celle e il layout si adattano automaticamente alla dimensione dello schermo.
-
-## 🔒 Funzionalità di Gioco
-
-### Convalida
-
-- Il gioco verifica automaticamente se i numeri inseriti sono corretti
-- Massimo 3 errori prima di game over
-- Errore evidenziato con animazione di scuotimento
-
-### Suggerimenti Intelligenti
-
-- 2 suggerimenti per puzzle
-- Un suggerimento riempie una cella con il numero corretto
-
-### Evidenziazione
-
-- La riga, colonna e riquadro della cella selezionata vengono evidenziati
-- I numeri uguali sulla griglia vengono evidenziati
-- Le celle correlate hanno sfondo tintato per chiarezza
-
-## 💾 Salvataggio Stato
-
-L'app salva automaticamente:
-
-- Lingua preferita
-- Tema preferito (chiaro/scuro)
-- Livello di difficoltà selezionato
+- Tema chiaro e scuro (segue quello del sistema, oppure scegli tu)
 
 ## 🐛 Problemi Noti
 
@@ -149,9 +110,8 @@ Questo progetto è distribuito sotto la licenza [MIT](LICENSE).
 
 ## 🙏 Riconoscimenti
 
-- **Generatore Sudoku**: Basato su [sudoku.js](https://github.com/robatron/sudoku.js) di robatron
-- **Icone**: Bootstrap Icons
-- **Font**: Outfit
+- **Ispirazione**: la prima versione usava [sudoku.js](https://github.com/robatron/sudoku.js) di robatron
+- **Font**: Syne e DM Mono (SIL Open Font License)
 
 ## ☕ Supporta lo Sviluppatore
 

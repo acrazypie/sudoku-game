@@ -1,37 +1,50 @@
-document.addEventListener("DOMContentLoaded", async () => {
-    const body = document.body;
-    const lightBtn = document.getElementById("light-mode");
-    const darkBtn = document.getElementById("dark-mode");
+// The initial theme is set by the inline script in <head> (saved choice, else system).
+function syncThemeColor(theme) {
+    // browser bar / Android task switcher colour follows the in-app theme
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+        m.setAttribute("content", theme === "light" ? "#fafafa" : "#0a0a0a");
+    });
+}
+syncThemeColor(document.documentElement.getAttribute("data-theme"));
 
-    // Reads the saved theme (or sets light)
-    const savedTheme = localStorage.getItem("theme") || "light";
-    body.classList.toggle("dark-theme", savedTheme === "dark");
+function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    syncThemeColor(theme);
+    try {
+        localStorage.setItem("theme", theme);
+    } catch (e) {}
+}
 
-    if (savedTheme === "dark") {
-        darkBtn.disabled = true;
-        lightBtn.disabled = false;
-        lightBtn.classList.remove("active");
-        darkBtn.classList.add("active");
-    } else {
-        lightBtn.disabled = true;
-        darkBtn.disabled = false;
-        darkBtn.classList.remove("active");
-        lightBtn.classList.add("active");
+function toggleTheme(event) {
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    const next = current === "dark" ? "light" : "dark";
+
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!document.startViewTransition || reduceMotion) {
+        applyTheme(next);
+        return;
     }
 
-    // Function to change theme
-    const setTheme = (theme) => {
-        const isLight = theme === "light";
-        body.classList.toggle("dark-theme", !isLight);
-        localStorage.setItem("theme", theme);
+    // Expand a circle from the click point (or the button's centre for
+    // keyboard activation) until it covers the whole viewport.
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX || rect.left + rect.width / 2;
+    const y = event.clientY || rect.top + rect.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
 
-        lightBtn.disabled = isLight;
-        darkBtn.disabled = !isLight;
-        lightBtn.classList.toggle("active", isLight);
-        darkBtn.classList.toggle("active", !isLight);
-    };
+    const transition = document.startViewTransition(() => applyTheme(next));
+    transition.ready
+        .then(() => {
+            document.documentElement.animate(
+                { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+                {
+                    duration: 600,
+                    easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                    pseudoElement: "::view-transition-new(root)",
+                },
+            );
+        })
+        .catch(() => {});
+}
 
-    // Event listeners
-    lightBtn.addEventListener("click", () => setTheme("light"));
-    darkBtn.addEventListener("click", () => setTheme("dark"));
-});
+document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
