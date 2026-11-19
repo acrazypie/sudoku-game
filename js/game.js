@@ -191,6 +191,7 @@ function show(route) {
     if (route === "home") renderHome();
     if (route === "daily") renderDaily();
     if (route === "stats") renderStats();
+    if (route === "install") renderInstall();
     if (route === "play") {
         renderAll();
         startClock();
@@ -200,7 +201,7 @@ function show(route) {
 
 function routeFromHash() {
     const r = location.hash.replace(/^#\/?/, "") || "home";
-    return ["home", "play", "daily", "stats"].includes(r) ? r : "home";
+    return ["home", "play", "daily", "stats", "install"].includes(r) ? r : "home";
 }
 addEventListener("hashchange", () => show(routeFromHash()));
 
@@ -900,6 +901,7 @@ function renderHome() {
     $("#home-daily-meta").textContent = daily[today] ? `✓ ${t("solved")}` : levelName(dailyLevel(today));
     const won = E.LEVEL_NAMES.reduce((a, lv) => a + stats[lv].won, 0);
     $("#home-stats-meta").textContent = won ? t("wins-count", { n: won }) : "";
+    $("#home-install-meta").textContent = isInstalled() ? `✓ ${t("installed")}` : "";
 }
 $("#resume").addEventListener("click", () => go("play"));
 $("#home-rules").addEventListener("click", () => openRules());
@@ -1149,6 +1151,62 @@ function openRules() {
     stopClock();
     openDialog("#dlg-rules");
 }
+
+// -------------------------------------------
+// Add to home screen
+// -------------------------------------------
+let installPrompt = null;
+
+function isInstalled() {
+    return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+}
+
+function detectPlatform() {
+    const ua = navigator.userAgent;
+    // iPadOS reports itself as a Mac, but has touch
+    if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return "ios";
+    if (/Android/.test(ua)) return "android";
+    return "desktop";
+}
+
+function renderInstall() {
+    const platform = detectPlatform();
+    const wrap = $("#install-cards");
+    // the visitor's own device goes first
+    const mine = wrap.querySelector(`[data-platform="${platform}"]`);
+    wrap.prepend(mine);
+    $$(".install-card", wrap).forEach((c, k) => {
+        c.classList.toggle("mine", c === mine);
+        c.style.setProperty("--k", k);
+    });
+    const installed = isInstalled();
+    $("#install-status").textContent = installed
+        ? t("install-done")
+        : installPrompt
+          ? t("install-ready")
+          : t(`install-how-${platform}`);
+    $(".install-hero").classList.toggle("done", installed);
+    $("#install-now").hidden = installed || !installPrompt;
+}
+
+// Chrome / Edge / Samsung Internet offer a one-tap install prompt
+addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    installPrompt = e;
+    if (screen === "install") renderInstall();
+});
+addEventListener("appinstalled", () => {
+    installPrompt = null;
+    if (screen === "install") renderInstall();
+    toast(t("install-done"));
+});
+$("#install-now").addEventListener("click", async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice.catch(() => {});
+    installPrompt = null;
+    renderInstall();
+});
 
 // -------------------------------------------
 // Language changes re-render text built in JS
