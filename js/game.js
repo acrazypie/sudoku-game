@@ -8,7 +8,7 @@ import * as E from "./engine.js";
 import { load, save, DEFAULT_SETTINGS, emptyStats, exportAll, importAll } from "./store.js";
 import { sfx, setSound } from "./sound.js";
 import { t, initLang, currentLang } from "./lang.js";
-import "./platform.js";
+import { isNative } from "./platform.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -1225,6 +1225,7 @@ buildBoard();
 buildNumpad();
 initLang().then(() => show(routeFromHash()));
 
-if ("serviceWorker" in navigator && location.protocol === "https:") {
+// offline cache for the website only; the app already ships every file
+if (!isNative && "serviceWorker" in navigator && location.protocol === "https:") {
     navigator.serviceWorker.register("sw.js").catch(() => {});
 }
