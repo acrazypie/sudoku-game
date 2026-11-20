@@ -1,6 +1,6 @@
 // sw.js — keeps the game playable offline. Serves the cached copy right away
 // and refreshes it in the background, so updates show up on the next visit.
-const CACHE = "sudoku-v3";
+const CACHE = "sudoku-v4";
 const FILES = [
     "./",
     "index.html",
@@ -11,6 +11,7 @@ const FILES = [
     "js/sound.js",
     "js/lang.js",
     "js/theme.js",
+    "js/platform.js",
     "lang/en.json",
     "lang/it.json",
     "lang/fr.json",

@@ -8,6 +8,7 @@ import * as E from "./engine.js";
 import { load, save, DEFAULT_SETTINGS, emptyStats, exportAll, importAll } from "./store.js";
 import { sfx, setSound } from "./sound.js";
 import { t, initLang, currentLang } from "./lang.js";
+import "./platform.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
