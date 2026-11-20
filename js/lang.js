@@ -23,7 +23,7 @@ async function fetchLang(lang) {
 
 export async function setLanguage(lang) {
     try {
-        localStorage.setItem("lang", lang);
+        (window.SudokuStorage || localStorage).setItem("lang", lang);
     } catch (e) {}
     document.documentElement.setAttribute("lang", lang);
 
@@ -91,7 +91,7 @@ export function initLang() {
 
     let savedLang = null;
     try {
-        savedLang = localStorage.getItem("lang");
+        savedLang = (window.SudokuStorage || localStorage).getItem("lang");
     } catch (e) {}
     const browserLang = (navigator.language || "en").split("-")[0];
     return setLanguage(

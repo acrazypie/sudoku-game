@@ -2,9 +2,21 @@
 
 const PREFIX = "sudoku:";
 
+// Where the data lives. In a browser this is localStorage, exactly as before.
+// The iOS / Android app can set window.SudokuStorage before the game loads:
+// the same getItem / setItem / removeItem as localStorage, plus keys(), and
+// an optional `ready` promise the game waits for before reading anything.
+const storage = window.SudokuStorage || {
+    getItem: (k) => localStorage.getItem(k),
+    setItem: (k, v) => localStorage.setItem(k, v),
+    removeItem: (k) => localStorage.removeItem(k),
+    keys: () => Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i)),
+};
+if (storage.ready) await Promise.resolve(storage.ready).catch(() => {});
+
 export function load(name, fallback) {
     try {
-        const raw = localStorage.getItem(PREFIX + name);
+        const raw = storage.getItem(PREFIX + name);
         if (raw == null) return fallback;
         const val = JSON.parse(raw);
         return fallback && typeof fallback === "object" && !Array.isArray(fallback)
@@ -17,8 +29,8 @@ export function load(name, fallback) {
 
 export function save(name, value) {
     try {
-        if (value == null) localStorage.removeItem(PREFIX + name);
-        else localStorage.setItem(PREFIX + name, JSON.stringify(value));
+        if (value == null) storage.removeItem(PREFIX + name);
+        else storage.setItem(PREFIX + name, JSON.stringify(value));
     } catch (e) {}
 }
 
@@ -50,9 +62,8 @@ export function emptyStats() {
 export function exportAll() {
     const out = {};
     try {
-        for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i);
-            if (k.startsWith(PREFIX)) out[k] = localStorage.getItem(k);
+        for (const k of storage.keys()) {
+            if (k.startsWith(PREFIX)) out[k] = storage.getItem(k);
         }
     } catch (e) {}
     return { app: "sudoku", version: 1, data: out };
@@ -62,7 +73,7 @@ export function importAll(obj) {
     if (!obj || obj.app !== "sudoku" || typeof obj.data !== "object") return false;
     try {
         for (const [k, v] of Object.entries(obj.data))
-            if (k.startsWith(PREFIX) && typeof v === "string") localStorage.setItem(k, v);
+            if (k.startsWith(PREFIX) && typeof v === "string") storage.setItem(k, v);
     } catch (e) {
         return false;
     }

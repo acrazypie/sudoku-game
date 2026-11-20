@@ -11,7 +11,7 @@ function applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
     syncThemeColor(theme);
     try {
-        localStorage.setItem("theme", theme);
+        (window.SudokuStorage || localStorage).setItem("theme", theme);
     } catch (e) {}
 }
 
