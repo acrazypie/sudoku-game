@@ -202,7 +202,9 @@ function show(route) {
 
 function routeFromHash() {
     const r = location.hash.replace(/^#\/?/, "") || "home";
-    return ["home", "play", "daily", "stats", "install"].includes(r) ? r : "home";
+    const routes = ["home", "play", "daily", "stats"];
+    if (!isNative) routes.push("install"); // the app is already installed
+    return routes.includes(r) ? r : "home";
 }
 addEventListener("hashchange", () => show(routeFromHash()));
 
@@ -904,6 +906,8 @@ function renderHome() {
     $("#home-stats-meta").textContent = won ? t("wins-count", { n: won }) : "";
     $("#home-install-meta").textContent = isInstalled() ? `✓ ${t("installed")}` : "";
 }
+// "Add to home screen" makes no sense inside the app
+if (isNative) $('a.row[href="#/install"]').closest("li").hidden = true;
 $("#resume").addEventListener("click", () => go("play"));
 $("#home-rules").addEventListener("click", () => openRules());
 $("#open-rules").addEventListener("click", () => openRules());
