@@ -8,7 +8,7 @@ import * as E from "./engine.js";
 import { load, save, DEFAULT_SETTINGS, emptyStats, exportAll, importAll } from "./store.js";
 import { sfx, setSound } from "./sound.js";
 import { t, initLang, currentLang } from "./lang.js";
-import { isNative } from "./platform.js";
+import { isNative, nativeHook } from "./platform.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -527,6 +527,7 @@ function place(i, d, fromHint = false) {
     if (!correct && settings.autoCheck) {
         g.mistakes++;
         sfx.wrong();
+        nativeHook("mistake");
         renderAll();
         animate(cells[i], "shake");
         if (settings.mistakeLimit) animate($("#hud-mistakes"), "bump");
@@ -557,8 +558,12 @@ function place(i, d, fromHint = false) {
     if (isSolved()) return win(i);
     if (done.length) {
         sfx.unit();
+        nativeHook("line", done.length);
         wave(i, done);
-    } else if (!fromHint) sfx.place();
+    } else if (!fromHint) {
+        sfx.place();
+        nativeHook("place");
+    }
 
     if (!settings.autoCheck && g.values.every((v) => v)) toast(t("complete-wrong"), "warn");
     saveGame();
@@ -707,6 +712,7 @@ function win(last) {
     selected = -1;
     renderAll();
     sfx.win();
+    nativeHook("win");
     // ripple across the whole board from the last cell
     const fr = E.rowOf(last);
     const fc = E.colOf(last);
