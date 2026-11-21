@@ -106,6 +106,7 @@
     "r2": "Toca una casilla y luego un número. Activa las Notas para apuntar los números posibles de una casilla.",
     "r3": "Cada sudoku tiene una única solución y se resuelve solo con lógica, sin adivinar.",
     "r4": "Cada número correcto suma puntos, más en los niveles difíciles. Completar una fila, columna o caja da un bonus, igual que terminar rápido y sin errores.",
+    "r5": "Mantén pulsado un número para fijarlo: cada casilla vacía que toques recibe ese número, que se resalta en todo el tablero. Tócalo otra vez para soltarlo.",
     "keyboard": "Teclado",
     "k-digit": "escribir un número",
     "k-note": "escribir una nota",

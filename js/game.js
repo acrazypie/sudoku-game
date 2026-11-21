@@ -31,6 +31,9 @@ if (!Array.isArray(history)) history = [];
 let game = load("game", null);
 let selected = -1;
 let notesMode = false;
+// long-press a number to lock it: every empty cell you tap gets that number
+let lockedDigit = 0;
+const LONG_PRESS_MS = 450;
 let clock = null;
 let screen = "home";
 let calMonth = monthStart(new Date());
@@ -244,6 +247,7 @@ function newGame(level, { mode = "classic", date = null } = {}) {
     save("stats", stats);
     selected = -1;
     notesMode = false;
+    setLock(0);
     saveGame();
     $("#board").classList.add("intro");
     go("play");
@@ -266,6 +270,7 @@ function restartGame() {
         paused: false,
     });
     selected = -1;
+    setLock(0);
     saveGame();
     $("#board").classList.add("intro");
     renderAll();
@@ -357,7 +362,10 @@ function buildBoard() {
     boardEl.addEventListener("pointerdown", (e) => {
         const c = e.target.closest(".cell");
         if (!c || !game || game.paused) return;
-        select(+c.dataset.i);
+        const i = +c.dataset.i;
+        select(i);
+        // number lock: an empty cell gets the locked number (or note) right away
+        if (lockedDigit && !game.values[i] && !game.won && !game.lost) return input(lockedDigit);
         sfx.tap();
     });
 }
@@ -370,12 +378,44 @@ function buildNumpad() {
         b.className = "num";
         b.dataset.d = d;
         b.innerHTML = `<span class="num__d">${d}</span><span class="num__left"></span>`;
+        // long-press locks the number; a tap while a number is locked switches
+        // the lock to this number, or releases it if it's the same one
+        let timer = null;
+        let long = false;
+        b.addEventListener("pointerdown", () => {
+            long = false;
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                long = true;
+                animate(b, "press");
+                setLock(lockedDigit === d ? 0 : d);
+            }, LONG_PRESS_MS);
+        });
+        for (const ev of ["pointerup", "pointerleave", "pointercancel"]) b.addEventListener(ev, () => clearTimeout(timer));
+        b.addEventListener("contextmenu", (e) => e.preventDefault());
         b.addEventListener("click", () => {
+            if (long) {
+                long = false;
+                return;
+            }
             animate(b, "press");
+            if (lockedDigit) return setLock(lockedDigit === d ? 0 : d);
             input(d);
         });
         pad.appendChild(b);
     }
+}
+
+function setLock(d) {
+    if (d && (!game || game.won || game.lost)) d = 0;
+    lockedDigit = d;
+    $$(".num").forEach((b) => {
+        const on = +b.dataset.d === d;
+        b.classList.toggle("locked", on);
+        b.setAttribute("aria-pressed", String(on));
+    });
+    if (d) nativeHook("lock", d);
+    renderBoard();
 }
 
 function select(i) {
@@ -394,7 +434,9 @@ function sameUnit(a, b) {
 function renderBoard() {
     if (!game) return;
     const g = game;
-    const sv = selected >= 0 ? g.values[selected] : 0;
+    // a locked number is highlighted everywhere, even with "highlight identical numbers" off
+    const sv = lockedDigit || (selected >= 0 ? g.values[selected] : 0);
+    const showSame = settings.highlightSame || !!lockedDigit;
     boardEl.classList.toggle("is-paused", g.paused);
     for (let i = 0; i < 81; i++) {
         const c = cells[i];
@@ -409,7 +451,7 @@ function renderBoard() {
             const on = !!(nm & E.bit(d));
             const n = notesEl.children[d - 1];
             n.classList.toggle("on", on);
-            n.classList.toggle("hit", on && settings.highlightSame && sv === d);
+            n.classList.toggle("hit", on && showSame && sv === d);
         }
 
         const wrong = !!v && !g.puzzle[i] && settings.autoCheck && v !== g.solution[i];
@@ -427,7 +469,7 @@ function renderBoard() {
         c.classList.toggle("conflict", conflict && !wrong);
         c.classList.toggle("selected", i === selected);
         c.classList.toggle("area", settings.highlightArea && selected >= 0 && i !== selected && sameUnit(i, selected));
-        c.classList.toggle("same", settings.highlightSame && !!sv && v === sv && i !== selected);
+        c.classList.toggle("same", showSame && !!sv && v === sv && i !== selected);
         c.setAttribute("aria-label", `r${E.rowOf(i) + 1}c${E.colOf(i) + 1} ${v || ""}`);
     }
 }
@@ -444,6 +486,7 @@ function renderNumpad() {
         b.querySelector(".num__left").textContent = left > 0 ? left : "";
         const wasDone = b.classList.contains("done");
         b.classList.toggle("done", left <= 0);
+        if (left <= 0 && d === lockedDigit) setLock(0);
         if (left <= 0 && !wasDone) animate(b, "finish");
     });
     $("#numpad").classList.toggle("notes-mode", notesMode);
@@ -915,7 +958,7 @@ document.addEventListener("keydown", (e) => {
         e.preventDefault();
         return setPaused(!game.paused);
     }
-    if (k === "Escape") return select(-1);
+    if (k === "Escape") return lockedDigit ? setLock(0) : select(-1);
 });
 
 // click outside the board clears the selection

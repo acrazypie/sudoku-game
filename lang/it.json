@@ -106,6 +106,7 @@
     "r2": "Tocca una cella, poi un numero. Attiva le Note per segnare i numeri possibili in una cella.",
     "r3": "Ogni puzzle ha una sola soluzione e si risolve solo con la logica, senza tirare a indovinare.",
     "r4": "Ogni numero giusto vale punti, di più ai livelli difficili. Completare una riga, colonna o riquadro dà un bonus, e anche finire in fretta senza errori.",
+    "r5": "Tieni premuto un numero per bloccarlo: ogni cella vuota che tocchi riceve quel numero, che viene evidenziato su tutta la griglia. Toccalo di nuovo per sbloccarlo.",
     "keyboard": "Tastiera",
     "k-digit": "inserisci un numero",
     "k-note": "scrivi una nota",

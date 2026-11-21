@@ -106,6 +106,7 @@
     "r2": "Tap a cell, then a number. Turn on Notes to pencil in the numbers a cell could be.",
     "r3": "Every puzzle has exactly one solution and can be solved by logic alone, no guessing.",
     "r4": "Each correct number scores points, more on harder levels. Finishing a row, column or box adds a bonus, and so does a fast finish with no mistakes.",
+    "r5": "Long-press a number to lock it: every empty cell you tap gets that number, and that number is highlighted on the board. Tap it again to release it.",
     "keyboard": "Keyboard",
     "k-digit": "enter a number",
     "k-note": "write a note",

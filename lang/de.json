@@ -106,6 +106,7 @@
     "r2": "Tippe auf ein Feld, dann auf eine Zahl. Mit Notizen trägst du mögliche Zahlen ein.",
     "r3": "Jedes Rätsel hat genau eine Lösung und lässt sich allein mit Logik lösen, ohne Raten.",
     "r4": "Jede richtige Zahl bringt Punkte, auf schweren Stufen mehr. Eine fertige Zeile, Spalte oder ein Block gibt einen Bonus, ebenso ein schneller, fehlerfreier Abschluss.",
+    "r5": "Halte eine Zahl gedrückt, um sie festzulegen: Jedes leere Feld, das du antippst, bekommt diese Zahl, und sie wird auf dem ganzen Brett hervorgehoben. Tippe sie erneut an, um sie zu lösen.",
     "keyboard": "Tastatur",
     "k-digit": "Zahl eintragen",
     "k-note": "Notiz schreiben",

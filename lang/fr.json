@@ -106,6 +106,7 @@
     "r2": "Touche une case, puis un chiffre. Active les Notes pour noter les chiffres possibles d'une case.",
     "r3": "Chaque grille a une seule solution et se résout uniquement par la logique, sans deviner.",
     "r4": "Chaque chiffre juste rapporte des points, davantage aux niveaux difficiles. Finir une ligne, une colonne ou un carré donne un bonus, tout comme finir vite et sans erreur.",
+    "r5": "Appuie longuement sur un chiffre pour le verrouiller : chaque case vide que tu touches reçoit ce chiffre, surligné sur toute la grille. Touche-le à nouveau pour le libérer.",
     "keyboard": "Clavier",
     "k-digit": "saisir un chiffre",
     "k-note": "écrire une note",
