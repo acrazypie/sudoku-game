@@ -643,40 +643,66 @@ function hint() {
         animate($("#t-hint"), "nudge");
         return toast(t("no-hints"));
     }
+    const h = findHint();
+    if (!h) return;
+    spendHint(h);
+
+    // The app can explain the hint in its own sheet and let the player choose
+    // to see the cell or place the number. In a browser this does nothing.
+    const actions = {
+        place: () => placeHint(h),
+        show: () => {
+            selected = h.cell;
+            renderBoard();
+        },
+    };
+    const info = { ...h, left: game.hints, total: HINTS_PER_GAME };
+    if (nativeHook("hint", info, actions) === true) return;
+
+    placeHint(h);
+    toast(h.text);
+}
+
+// Works out the next hint without changing anything:
+// { cell, digit, kind, text }, kind = wrong | naked | hidden-row |
+// hidden-col | hidden-box | advanced | reveal
+function findHint() {
     const g = game;
 
     // a wrong number on the board is the first thing worth pointing out
     const wrong = g.values.findIndex((v, i) => v && !g.puzzle[i] && v !== g.solution[i]);
     if (wrong >= 0 && (selected < 0 || selected === wrong || !g.values[selected] || g.values[selected] === g.solution[selected])) {
-        selected = wrong;
-        g.hints--;
-        g.values[wrong] = 0;
-        sfx.hint();
-        place(wrong, g.solution[wrong], true);
-        g.scored[wrong] = 1;
-        return toast(t("hint-wrong", { n: g.solution[wrong] }));
+        const n = g.solution[wrong];
+        return { cell: wrong, digit: n, kind: "wrong", text: t("hint-wrong", { n }) };
     }
 
     const known = g.values.map((v, i) => (v === g.solution[i] ? v : 0));
     const prefer = selected >= 0 && !known[selected] ? selected : -1;
     const step = E.nextStep(known, prefer);
-    let i;
-    let msg;
     if (step) {
-        i = step.cell;
-        const key = step.tech > 1 ? "hint-advanced" : `hint-${step.kind}`;
-        msg = t(key, { n: step.digit });
-    } else {
-        i = prefer >= 0 ? prefer : known.findIndex((v) => !v);
-        msg = t("hint-reveal", { n: g.solution[i] });
+        const kind = step.tech > 1 ? "advanced" : step.kind;
+        return { cell: step.cell, digit: step.digit, kind, text: t(`hint-${kind}`, { n: step.digit }) };
     }
-    if (i < 0) return;
-    selected = i;
-    g.hints--;
-    g.scored[i] = 1;
+    const i = prefer >= 0 ? prefer : known.findIndex((v) => !v);
+    if (i < 0) return null;
+    return { cell: i, digit: g.solution[i], kind: "reveal", text: t("hint-reveal", { n: g.solution[i] }) };
+}
+
+// Uses up one hint; the hinted cell won't score points.
+function spendHint(h) {
+    selected = h.cell;
+    game.hints--;
+    game.scored[h.cell] = 1;
     sfx.hint();
-    place(i, g.solution[i], true);
-    toast(msg);
+    renderAll();
+    saveGame();
+}
+
+function placeHint(h) {
+    if (!game || game.won || game.lost) return;
+    if (h.kind === "wrong") game.values[h.cell] = 0;
+    selected = h.cell;
+    place(h.cell, h.digit, true);
     saveGame();
 }
 

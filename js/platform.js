@@ -12,12 +12,15 @@ export const platform = isNative ? cap.getPlatform() : "web";
 document.documentElement.dataset.platform = platform;
 
 // Optional hooks for the app (haptics etc.). The app sets window.SudokuNative
-// with any of: place(), mistake(), line(count), win(). In a browser there is
-// no window.SudokuNative, so this does nothing.
+// with any of: place(), mistake(), line(count), win(), hint(info, actions).
+// Returns whatever the hook returns. In a browser there is no
+// window.SudokuNative, so this does nothing and returns undefined.
 export function nativeHook(name, ...args) {
     const n = window.SudokuNative;
-    if (!n || typeof n[name] !== "function") return;
+    if (!n || typeof n[name] !== "function") return undefined;
     try {
-        n[name](...args);
-    } catch (e) {}
+        return n[name](...args);
+    } catch (e) {
+        return undefined;
+    }
 }
