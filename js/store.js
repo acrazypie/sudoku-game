@@ -51,6 +51,7 @@ export function emptyStats() {
         won: 0,
         perfect: 0,
         bestTime: 0,
+        bestDate: "", // YYYY-MM-DD of the best time
         totalTime: 0,
         streak: 0,
         bestStreak: 0,

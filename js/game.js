@@ -26,6 +26,8 @@ const DAILY_START = "2025-01-01";
 let settings = load("settings", DEFAULT_SETTINGS);
 let stats = load("stats", {});
 let daily = load("daily", {});
+let history = load("history", []);
+if (!Array.isArray(history)) history = [];
 let game = load("game", null);
 let selected = -1;
 let notesMode = false;
@@ -212,7 +214,10 @@ addEventListener("hashchange", () => show(routeFromHash()));
 // New game
 // -------------------------------------------
 function newGame(level, { mode = "classic", date = null } = {}) {
-    if (inProgress() && !game.lost) breakStreak(game.level);
+    if (inProgress() && !game.lost) {
+        breakStreak(game.level);
+        recordGame("quit");
+    } else if (game && game.lost) recordGame("lost"); // lost, but the game-over choice was never made
     const seed = mode === "daily" ? E.hashSeed(`daily:${date}`) : (Math.random() * 2 ** 32) >>> 0;
     const p = E.generate(level, seed);
     game = {
@@ -271,6 +276,19 @@ function askNewGame(level, opts) {
     if (inProgress() && !game.lost && !(opts && opts.mode === "daily" && game.date === opts.date)) {
         confirmBox(t("new-warn"), t("start"), () => newGame(level, opts));
     } else newGame(level, opts);
+}
+
+// Keeps the last HISTORY_MAX finished games (newest last) for charts:
+// { d: date, lv: level, t: seconds, s: score, m: mistakes, r: "won" | "lost" | "quit", daily?: true }
+const HISTORY_MAX = 50;
+function recordGame(result) {
+    if (!game) return;
+    const g = game;
+    const entry = { d: todayKey(), lv: g.level, t: g.time, s: g.score, m: g.mistakes, r: result };
+    if (g.mode === "daily") entry.daily = true;
+    history.push(entry);
+    if (history.length > HISTORY_MAX) history = history.slice(-HISTORY_MAX);
+    save("history", history);
 }
 
 function breakStreak(level) {
@@ -723,12 +741,16 @@ function win(last) {
     const record = !s.bestTime || g.time < s.bestTime;
     s.won++;
     if (g.mistakes === 0) s.perfect++;
-    if (record) s.bestTime = g.time;
+    if (record) {
+        s.bestTime = g.time;
+        s.bestDate = todayKey();
+    }
     s.totalTime += g.time;
     s.streak++;
     s.bestStreak = Math.max(s.bestStreak, s.streak);
     s.bestScore = Math.max(s.bestScore, g.score);
     save("stats", stats);
+    recordGame("won");
     if (g.mode === "daily") {
         daily[g.date] = { time: g.time, score: g.score, level: g.level };
         save("daily", daily);
@@ -785,6 +807,7 @@ function showOver() {
 function finishLost() {
     if (game && game.lost) {
         breakStreak(game.level);
+        recordGame("lost");
         save("game", null);
     }
 }
@@ -1108,6 +1131,8 @@ $("#stats-reset").addEventListener("click", () => {
     confirmBox(t("reset-confirm"), t("reset"), () => {
         for (const lv of E.LEVEL_NAMES) stats[lv] = emptyStats();
         save("stats", stats);
+        history = [];
+        save("history", history);
         renderStats();
     });
 });
