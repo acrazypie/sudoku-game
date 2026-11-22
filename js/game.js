@@ -33,7 +33,7 @@ let selected = -1;
 let notesMode = false;
 // long-press a number to lock it: every empty cell you tap gets that number
 let lockedDigit = 0;
-const LONG_PRESS_MS = 450;
+const LONG_PRESS_MS = 300;
 let clock = null;
 let screen = "home";
 let calMonth = monthStart(new Date());
@@ -468,7 +468,7 @@ function renderBoard() {
         c.classList.toggle("wrong", wrong);
         c.classList.toggle("conflict", conflict && !wrong);
         c.classList.toggle("selected", i === selected);
-        c.classList.toggle("area", settings.highlightArea && selected >= 0 && i !== selected && sameUnit(i, selected));
+        c.classList.toggle("area", settings.highlightArea && !lockedDigit && selected >= 0 && i !== selected && sameUnit(i, selected));
         c.classList.toggle("same", showSame && !!sv && v === sv && i !== selected);
         c.setAttribute("aria-label", `r${E.rowOf(i) + 1}c${E.colOf(i) + 1} ${v || ""}`);
     }
