@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <title>Join the Sudoku closed test</title>
+        <meta
+            name="description"
+            content="Leave your email to join the closed test of Sudoku on Google Play." />
+        <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+        <link rel="icon" href="../icons/favicon.ico" sizes="32x32" />
+        <link rel="icon" type="image/svg+xml" href="../icons/favicon.svg" />
+        <style>
+            @font-face { font-family: "Syne"; src: url("../fonts/syne-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+            @font-face { font-family: "DM Mono"; src: url("../fonts/dm-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+
+            :root {
+                --bg: #0a0a0a;
+                --bg-raise: #121214;
+                --line: rgba(255, 255, 255, 0.08);
+                --line-hi: rgba(255, 255, 255, 0.16);
+                --text: #efefef;
+                --mid: #8d8d96;
+                --dim: #5c5c66;
+                --accent: #6aa8ff;
+                --accent-ink: #0a0a0a;
+                --accent-lo: rgba(106, 168, 255, 0.1);
+                --warn: #ff5c8a;
+                --ok: #4ade80;
+                --syne: "Syne", ui-sans-serif, system-ui, sans-serif;
+                --mono: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+                color-scheme: dark;
+            }
+            @media (prefers-color-scheme: light) {
+                :root:not([data-theme="dark"]) {
+                    --bg: #fafafa;
+                    --bg-raise: #f1f1f4;
+                    --line: rgba(0, 0, 0, 0.08);
+                    --line-hi: rgba(0, 0, 0, 0.16);
+                    --text: #17171a;
+                    --mid: #55555f;
+                    --dim: #8a8a94;
+                    --accent: #2563eb;
+                    --accent-ink: #ffffff;
+                    --accent-lo: rgba(37, 99, 235, 0.07);
+                    --warn: #e0336a;
+                    --ok: #1f8a4c;
+                    color-scheme: light;
+                }
+            }
+
+            * { box-sizing: border-box; }
+            html, body { margin: 0; }
+            body {
+                min-height: 100vh;
+                background: var(--bg);
+                color: var(--text);
+                font-family: var(--mono);
+                font-weight: 400;
+                line-height: 1.55;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1rem;
+            }
+            main { width: 100%; max-width: 420px; }
+            .kicker {
+                font-size: 0.75rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--accent);
+                margin: 0 0 0.75rem;
+            }
+            h1 {
+                font-family: var(--syne);
+                font-weight: 700;
+                font-size: clamp(1.9rem, 6vw, 2.4rem);
+                line-height: 1.1;
+                margin: 0 0 1rem;
+            }
+            p { margin: 0 0 1rem; color: var(--mid); }
+            .rule { border: 0; border-top: 1px solid var(--line-hi); margin: 1.5rem 0; }
+
+            form { display: grid; gap: 0.75rem; }
+            label { font-size: 0.8rem; color: var(--mid); }
+            input[type="email"] {
+                width: 100%;
+                font: inherit;
+                font-size: 1rem;
+                color: var(--text);
+                background: var(--bg-raise);
+                border: 1px solid var(--line-hi);
+                border-radius: 10px;
+                padding: 0.85rem 0.95rem;
+                outline: none;
+            }
+            input[type="email"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-lo); }
+            input[type="email"][aria-invalid="true"] { border-color: var(--warn); }
+            button {
+                font-family: var(--syne);
+                font-weight: 700;
+                font-size: 1rem;
+                color: var(--accent-ink);
+                background: var(--accent);
+                border: 0;
+                border-radius: 10px;
+                padding: 0.9rem 1rem;
+                cursor: pointer;
+            }
+            button:disabled { opacity: 0.6; cursor: progress; }
+            button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+            /* honeypot: visually and for assistive tech hidden, but present for bots */
+            .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+            #status { min-height: 1.5em; font-size: 0.9rem; margin: 0.25rem 0 0; }
+            #status[data-kind="ok"] { color: var(--ok); }
+            #status[data-kind="error"] { color: var(--warn); }
+
+            .fine { font-size: 0.75rem; color: var(--dim); margin-top: 1.5rem; }
+            a { color: var(--accent); }
+        </style>
+    </head>
+    <body>
+        <main>
+            <p class="kicker">Closed test · Google Play</p>
+            <h1>Help test Sudoku on Android</h1>
+            <p>
+                The Android app is in a closed test on Google Play. Leave the email address of your Google account and
+                you will be added to the tester list. You will get the Play Store link to install the app.
+            </p>
+
+            <form id="join-form" novalidate>
+                <label for="email">Google account email</label>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    inputmode="email"
+                    autocomplete="email"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    maxlength="254"
+                    placeholder="you@gmail.com"
+                    required />
+                <button id="submit" type="submit">Join the test</button>
+                <p id="status" role="status" aria-live="polite"></p>
+
+                <div class="hp" aria-hidden="true">
+                    <label for="website">Leave this field empty</label>
+                    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+                </div>
+            </form>
+
+            <hr class="rule" />
+            <p class="fine">
+                Your address is used only to add you to this closed test and is not shared or used for marketing. It
+                is stored in a private database. <a href="../">Back to the game</a>
+            </p>
+        </main>
+
+        <script>
+            /* Fill these in after creating the Supabase project (see join/waitlist.sql).
+               The anon key is public by design: the table only allows inserting emails. */
+            const WAITLIST = {
+                url: "https://ixzpabklrdngbxsdlwby.supabase.co",
+                anonKey: "sb_publishable_FxIWz9uT_YmjmrtQvomBVg_ul6COFaD",
+            };
+
+            const form = document.getElementById("join-form");
+            const input = document.getElementById("email");
+            const button = document.getElementById("submit");
+            const status = document.getElementById("status");
+            const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            function show(text, kind) {
+                status.textContent = text;
+                status.dataset.kind = kind;
+            }
+
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+
+                // Bots fill the hidden field: pretend it worked, store nothing.
+                if (form.website.value) {
+                    show("You're on the list. Thanks!", "ok");
+                    form.reset();
+                    return;
+                }
+
+                const email = input.value.trim().toLowerCase();
+                if (!EMAIL_RE.test(email) || email.length > 254) {
+                    input.setAttribute("aria-invalid", "true");
+                    show("Please enter a valid email address.", "error");
+                    input.focus();
+                    return;
+                }
+                input.removeAttribute("aria-invalid");
+
+                button.disabled = true;
+                show("Sending…", "info");
+                try {
+                    const res = await fetch(`${WAITLIST.url}/rest/v1/waitlist`, {
+                        method: "POST",
+                        headers: {
+                            apikey: WAITLIST.anonKey,
+                            "Content-Type": "application/json",
+                            Prefer: "return=minimal",
+                        },
+                        body: JSON.stringify({ email }),
+                    });
+                    // 409 = address already on the list, which counts as success.
+                    if (!res.ok && res.status !== 409) throw new Error(`HTTP ${res.status}`);
+                    form.reset();
+                    show("You're on the list. Thanks! Watch for the Play Store invite.", "ok");
+                } catch (err) {
+                    show("Something went wrong. Please try again in a moment.", "error");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        </script>
+    </body>
+</html>
