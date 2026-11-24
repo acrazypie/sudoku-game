@@ -118,6 +118,21 @@
             #status[data-kind="ok"] { color: var(--ok); }
             #status[data-kind="error"] { color: var(--warn); }
 
+            dialog {
+                width: calc(100% - 2rem);
+                max-width: 380px;
+                background: var(--bg-raise);
+                color: var(--text);
+                border: 1px solid var(--line-hi);
+                border-radius: 14px;
+                padding: 1.5rem;
+                font-family: var(--mono);
+            }
+            dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+            dialog h2 { font-family: var(--syne); font-weight: 700; font-size: 1.4rem; line-height: 1.2; margin: 0 0 0.75rem; }
+            dialog p { margin: 0 0 1.25rem; color: var(--mid); }
+            dialog button { width: 100%; }
+
             .fine { font-size: 0.75rem; color: var(--dim); margin-top: 1.5rem; }
             a { color: var(--accent); }
 
@@ -173,6 +188,12 @@
                 </div>
             </form>
 
+            <dialog id="joined" aria-labelledby="joined-title" aria-describedby="joined-text">
+                <h2 id="joined-title" data-i18n="popupTitle">Sei in lista!</h2>
+                <p id="joined-text" data-i18n="popupText">Riceverai un'email con il link per scaricare l'app da Google Play.</p>
+                <button type="button" id="joined-close" data-i18n="popupClose">OK</button>
+            </dialog>
+
             <hr class="rule" />
             <p class="fine">
                 <span data-i18n="fine">
@@ -195,6 +216,8 @@
             const input = document.getElementById("email");
             const button = document.getElementById("submit");
             const status = document.getElementById("status");
+            const joinedDialog = document.getElementById("joined");
+            document.getElementById("joined-close").addEventListener("click", () => joinedDialog.close());
             const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
             const STRINGS = {
@@ -211,6 +234,9 @@
                     ok: "Sei in lista. Grazie! Attendi l'invito da Google Play.",
                     invalid: "Inserisci un indirizzo email valido.",
                     error: "Qualcosa è andato storto. Riprova tra poco.",
+                    popupTitle: "Sei in lista!",
+                    popupText: "Riceverai un'email con il link per scaricare l'app da Google Play.",
+                    popupClose: "OK",
                 },
                 en: {
                     title: "Join the Sudoku closed test",
@@ -225,6 +251,9 @@
                     ok: "You're on the list. Thanks! Watch for the Play Store invite.",
                     invalid: "Please enter a valid email address.",
                     error: "Something went wrong. Please try again in a moment.",
+                    popupTitle: "You're on the list!",
+                    popupText: "You will receive an email with the link to download the app from Google Play.",
+                    popupClose: "OK",
                 },
             };
 
@@ -301,6 +330,7 @@
                     if (!res.ok && res.status !== 409) throw new Error(`HTTP ${res.status}`);
                     form.reset();
                     show("ok", "ok");
+                    joinedDialog.showModal();
                 } catch (err) {
                     show("error", "error");
                 } finally {
